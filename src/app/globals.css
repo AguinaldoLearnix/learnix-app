@@ -1,26 +1,144 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ─── Framer-inspired design system ─────────────────────────── */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Surfaces */
+  --color-canvas:    #0C0B0A;
+  --color-surface-1: #1A1917;
+  --color-surface-2: #252320;
+  --color-hairline:      rgba(255,255,255,0.10);
+  --color-hairline-soft: rgba(255,255,255,0.06);
+
+  /* Text */
+  --color-ink:       #FFFFFF;
+  --color-ink-muted: #999999;
+
+  /* Accent */
+  --color-accent-blue: #0099FF;
+
+  /* Gradient stops (base anchors) */
+  --color-gradient-violet:  #4C1D95;
+  --color-gradient-magenta: #9D174D;
+  --color-gradient-orange:  #92400E;
+  --color-gradient-coral:   #9F1239;
+
+  /* Shadcn token aliases → dark canvas */
+  --color-background:        var(--color-canvas);
+  --color-foreground:        var(--color-ink);
+  --color-card:              var(--color-surface-1);
+  --color-card-foreground:   var(--color-ink);
+  --color-popover:           var(--color-surface-1);
+  --color-popover-foreground:var(--color-ink);
+  --color-primary:           var(--color-ink);
+  --color-primary-foreground:var(--color-canvas);
+  --color-secondary:         var(--color-surface-1);
+  --color-secondary-foreground: var(--color-ink);
+  --color-muted:             var(--color-surface-1);
+  --color-muted-foreground:  var(--color-ink-muted);
+  --color-accent:            var(--color-surface-2);
+  --color-accent-foreground: var(--color-ink);
+  --color-destructive:       #EF4444;
+  --color-border:            var(--color-hairline);
+  --color-input:             var(--color-surface-1);
+  --color-ring:              var(--color-accent-blue);
+
+  /* Radius scale */
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   15px;
+  --radius-xl:   20px;
+  --radius-2xl:  30px;
+  --radius-pill: 100px;
+
+  /* Base radius alias used by shadcn */
+  --radius: 10px;
+
+  /* Font */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* legacy shadcn tokens — point them at the new system */
+  --background:        #0C0B0A;
+  --foreground:        #FFFFFF;
+  --card:              #1A1917;
+  --card-foreground:   #FFFFFF;
+  --popover:           #1A1917;
+  --popover-foreground:#FFFFFF;
+  --primary:           #FFFFFF;
+  --primary-foreground:#0C0B0A;
+  --secondary:         #1A1917;
+  --secondary-foreground:#FFFFFF;
+  --muted:             #1A1917;
+  --muted-foreground:  #999999;
+  --accent:            #252320;
+  --accent-foreground: #FFFFFF;
+  --destructive:       #EF4444;
+  --border:            rgba(255,255,255,0.10);
+  --input:             #1A1917;
+  --ring:              #0099FF;
+  --radius:            10px;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply antialiased;
+    font-feature-settings: "cv01","cv05","cv09","cv11","ss03","ss07","dlig";
+  }
+  body {
+    background-color: #0C0B0A;
+    color: #FFFFFF;
+    font-family: var(--font-sans);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ─── Gradient spotlight cards ──────────────────────────────── */
+.gradient-violet {
+  background: linear-gradient(135deg, #1E0A3C 0%, #4C1D95 45%, #7C3AED 100%);
+}
+.gradient-magenta {
+  background: linear-gradient(135deg, #500724 0%, #9D174D 45%, #DB2777 100%);
+}
+.gradient-orange {
+  background: linear-gradient(135deg, #431407 0%, #92400E 45%, #EA580C 100%);
+}
+.gradient-coral {
+  background: linear-gradient(135deg, #4C0519 0%, #9F1239 45%, #F43F5E 100%);
+}
+
+/* ─── Typography helpers ────────────────────────────────────── */
+.display-xl {
+  font-size: clamp(42px, 6vw, 85px);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+}
+.display-lg {
+  font-size: clamp(28px, 4vw, 62px);
+  font-weight: 500;
+  line-height: 1.00;
+  letter-spacing: -0.05em;
+}
+.display-md {
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1.13;
+  letter-spacing: -0.031em;
+}
+
+/* ─── Card elevation helpers ────────────────────────────────── */
+.card-elevated {
+  box-shadow:
+    0 0.5px 0 0 rgba(255,255,255,0.10),
+    0 10px 30px 0 rgba(0,0,0,0.25);
+}
+.card-selected {
+  box-shadow: 0 0 0 1px rgba(0,153,255,0.40);
 }
