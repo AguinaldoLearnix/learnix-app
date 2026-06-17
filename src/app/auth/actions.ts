@@ -51,6 +51,11 @@ export async function signup(formData: FormData) {
 
   if (error) return { error: error.message }
 
+  // Email confirmation pending — no active session yet
+  if (!authData.session) {
+    return { confirm: true }
+  }
+
   // Consume invite token — assign teacher + optional group
   if (inviteToken && authData.user) {
     const { data: invite } = await supabase
