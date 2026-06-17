@@ -29,22 +29,29 @@ export default function TeacherOnboarding() {
   async function handleSave() {
     setSaving(true)
     setErrorMsg('')
-    const res = await fetch('/api/onboarding/complete-teacher', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        languages: selectedLanguages,
-        specialties: selectedSpecialties,
-        bio,
-        rate_per_hour: ratePerHour,
-        max_students: maxStudents,
-      }),
-    })
-    const result = await res.json()
-    if (result?.redirectTo) {
-      window.location.href = result.redirectTo
-    } else {
-      setErrorMsg(result?.error ?? 'Erro desconhecido — tente novamente.')
+    try {
+      const res = await fetch('/api/onboarding/complete-teacher', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          languages: selectedLanguages,
+          specialties: selectedSpecialties,
+          bio,
+          rate_per_hour: ratePerHour,
+          max_students: maxStudents,
+        }),
+      })
+      const text = await res.text()
+      let result: any
+      try { result = JSON.parse(text) } catch { result = { error: `Resposta inválida (${res.status}): ${text.slice(0, 200)}` } }
+      if (result?.redirectTo) {
+        window.location.href = result.redirectTo
+      } else {
+        setErrorMsg(result?.error ?? 'Erro desconhecido — tente novamente.')
+        setSaving(false)
+      }
+    } catch (e: any) {
+      setErrorMsg(`Erro de rede: ${e.message}`)
       setSaving(false)
     }
   }
