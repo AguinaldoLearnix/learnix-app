@@ -29,11 +29,13 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
       const { data: { user } } = await supabase.auth.getUser()
-      const { data: profile } = await supabase.from('users').select('role').eq('id', user!.id).single()
+      const { data: profile } = await supabase.from('users').select('role, created_at').eq('id', user!.id).single()
       const role = profile?.role
 
-      // Brand-new Google user — no role set yet
-      if (!role) {
+      // Brand-new Google signup (created within last 30s) → show role picker
+      const isNewUser = profile?.created_at &&
+        (Date.now() - new Date(profile.created_at).getTime()) < 30_000
+      if (isNewUser) {
         response.headers.set('Location', `${origin}/onboarding/role`)
         return response
       }
