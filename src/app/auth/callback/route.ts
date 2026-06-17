@@ -12,7 +12,13 @@ export async function GET(request: Request) {
     if (!error) {
       const { data: { user } } = await supabase.auth.getUser()
       const { data: profile } = await supabase.from('users').select('role').eq('id', user!.id).single()
-      const role = profile?.role ?? 'student'
+      const role = profile?.role
+
+      // Brand-new Google user — no role set yet, pick role first
+      if (!role) {
+        return NextResponse.redirect(`${origin}/onboarding/role`)
+      }
+
       let dest: string
       if (next !== '/student') {
         dest = next

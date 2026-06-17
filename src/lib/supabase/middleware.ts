@@ -29,7 +29,7 @@ export async function updateSession(request: NextRequest) {
 
   // Public routes — accessible without auth
   const publicRoutes = ['/login', '/signup', '/reset-password']
-  const onboardingRoutes = ['/onboarding']
+  const onboardingRoutes = ['/onboarding', '/onboarding/role']
   const isPublic = publicRoutes.some(r => pathname.startsWith(r))
   const isOnboarding = onboardingRoutes.some(r => pathname.startsWith(r))
 
