@@ -15,13 +15,15 @@ Question 3 (advanced — professional opinion): "${answers[2]}"
 
 Assess the overall CEFR level (A1, A2, B1, B2, C1, or C2) based on: vocabulary range, grammar accuracy, sentence complexity, coherence, and fluency of expression.
 
+IMPORTANT: Write the "explanation", "strong_areas", and "weak_areas" fields IN PORTUGUESE (Brazilian Portuguese). Only the JSON keys and the level value stay in English.
+
 Respond ONLY with a JSON object:
 {
   "level": "B1",
   "confidence": "high",
-  "explanation": "Brief 1-sentence explanation of why this level",
-  "strong_areas": ["vocabulary", "coherence"],
-  "weak_areas": ["grammar accuracy", "sentence complexity"]
+  "explanation": "Frase curta explicando o nível (em português)",
+  "strong_areas": ["vocabulário", "coerência"],
+  "weak_areas": ["precisão gramatical", "complexidade das frases"]
 }`
 
     const completion = await openai.chat.completions.create({

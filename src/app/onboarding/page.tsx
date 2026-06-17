@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from 'react'
 import { GraduationCap, ChevronRight, ChevronLeft, Loader2, Check, Mic, Brain, BookOpen, Target, Clock, Globe } from 'lucide-react'
-import { completeStudentOnboarding } from './actions'
 
 type Step = 'welcome' | 'profile' | 'goals' | 'schedule' | 'assessment' | 'generating' | 'preview'
 
@@ -119,21 +118,34 @@ export default function StudentOnboarding() {
   async function handleConfirm() {
     if (!program) return
     setSaving(true)
-    const result = await completeStudentOnboarding({
-      professional_area: professionalArea,
-      language,
-      goal,
-      target_level: targetLevel,
-      deadline_months: deadlineMonths,
-      weekly_frequency: weeklyFrequency,
-      study_time_daily: studyTimeDaily,
-      interests,
-      assessed_level: assessedLevel,
-      program,
-    })
-    if (result?.redirectTo) {
-      window.location.href = result.redirectTo
-    } else {
+    try {
+      const res = await fetch('/api/onboarding/complete-student', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          professional_area: professionalArea,
+          language,
+          goal,
+          target_level: targetLevel,
+          deadline_months: deadlineMonths,
+          weekly_frequency: weeklyFrequency,
+          study_time_daily: studyTimeDaily,
+          interests,
+          assessed_level: assessedLevel,
+          program,
+        }),
+      })
+      const text = await res.text()
+      let result: any
+      try { result = JSON.parse(text) } catch { result = { error: `Erro ${res.status}: ${text.slice(0, 200)}` } }
+      if (result?.redirectTo) {
+        window.location.href = result.redirectTo
+      } else {
+        alert(result?.error ?? 'Erro desconhecido. Tente novamente.')
+        setSaving(false)
+      }
+    } catch (e: any) {
+      alert(`Erro de rede: ${e.message}`)
       setSaving(false)
     }
   }
