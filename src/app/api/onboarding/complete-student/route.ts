@@ -56,11 +56,10 @@ export async function POST(request: NextRequest) {
     .from('programs')
     .insert({
       student_id: user.id,
-      title: program.title,
-      description: program.description,
       total_weeks: program.total_weeks,
       start_level: assessed_level,
       target_level,
+      goal: goal ?? 'professional',
       language: language ?? 'english',
       start_date: startDate.toISOString().split('T')[0],
       end_date: endDate.toISOString().split('T')[0],
