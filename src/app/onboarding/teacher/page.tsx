@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { GraduationCap, ChevronRight, ChevronLeft, Loader2, Check } from 'lucide-react'
-import { completeTeacherOnboarding } from '../actions'
 
 const LANGUAGE_OPTIONS = ['Inglês', 'Espanhol', 'Francês', 'Alemão', 'Italiano', 'Mandarim', 'Português']
 const SPECIALTY_OPTIONS = [
@@ -30,13 +29,18 @@ export default function TeacherOnboarding() {
   async function handleSave() {
     setSaving(true)
     setErrorMsg('')
-    const result = await completeTeacherOnboarding({
-      languages: selectedLanguages,
-      specialties: selectedSpecialties,
-      bio,
-      rate_per_hour: ratePerHour,
-      max_students: maxStudents,
+    const res = await fetch('/api/onboarding/complete-teacher', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        languages: selectedLanguages,
+        specialties: selectedSpecialties,
+        bio,
+        rate_per_hour: ratePerHour,
+        max_students: maxStudents,
+      }),
     })
+    const result = await res.json()
     if (result?.redirectTo) {
       window.location.href = result.redirectTo
     } else {
