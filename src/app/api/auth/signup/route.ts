@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json()
   const { email, password, full_name, role, language, current_level, goal, invite_token } = body
 
-  const response = NextResponse.json({ ok: false })
+  const pending: Array<{ name: string; value: string; options: Record<string, unknown> }> = []
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
             request.cookies.set(name, value)
-            response.cookies.set(name, value, options)
+            pending.push({ name, value, options: options as Record<string, unknown> })
           })
         },
       },
@@ -50,6 +50,6 @@ export async function POST(request: NextRequest) {
 
   const redirectTo = role === 'teacher' ? '/onboarding/teacher' : '/onboarding'
   const res = NextResponse.json({ redirectTo })
-  response.cookies.getAll().forEach(c => res.cookies.set(c.name, c.value))
+  pending.forEach(({ name, value, options }) => res.cookies.set(name, value, options))
   return res
 }

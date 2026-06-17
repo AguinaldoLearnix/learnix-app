@@ -4,7 +4,7 @@ import { createServerClient } from '@supabase/ssr'
 export async function POST(request: NextRequest) {
   const { email, password } = await request.json()
 
-  const response = NextResponse.json({ ok: false })
+  const pending: Array<{ name: string; value: string; options: Record<string, unknown> }> = []
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
             request.cookies.set(name, value)
-            response.cookies.set(name, value, options)
+            pending.push({ name, value, options: options as Record<string, unknown> })
           })
         },
       },
@@ -23,7 +23,9 @@ export async function POST(request: NextRequest) {
   )
 
   const { error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error) return NextResponse.json({ error: error.message })
+  if (error) {
+    return NextResponse.json({ error: error.message })
+  }
 
   const { data: { user } } = await supabase.auth.getUser()
   const { data: profile } = await supabase.from('users').select('role').eq('id', user!.id).single()
@@ -43,8 +45,7 @@ export async function POST(request: NextRequest) {
     redirectTo = (count ?? 0) > 0 ? '/student' : '/onboarding'
   }
 
-  // Copy cookies to a fresh JSON response
   const res = NextResponse.json({ redirectTo })
-  response.cookies.getAll().forEach(c => res.cookies.set(c.name, c.value))
+  pending.forEach(({ name, value, options }) => res.cookies.set(name, value, options))
   return res
 }
