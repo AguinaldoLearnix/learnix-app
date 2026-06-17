@@ -1,4 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
+
+function adminClient() {
+  return createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  )
+}
 
 export async function getTeacherProfile() {
   const supabase = await createClient()
@@ -76,7 +85,8 @@ export async function getTeacherStudents() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
 
-  const { data } = await supabase
+  const admin = adminClient()
+  const { data } = await admin
     .from('student_profiles')
     .select(`
       *,
@@ -93,7 +103,8 @@ export async function getTeacherGroups() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
 
-  const { data } = await supabase
+  const admin = adminClient()
+  const { data } = await admin
     .from('groups')
     .select(`
       *,

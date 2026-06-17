@@ -7,14 +7,22 @@ export async function getStudentDashboard(): Promise<StudentDashboard | null> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  // Profile + program
+  // Profile
   const { data: profile } = await supabase
     .from('student_profiles')
-    .select('*, program:programs(id, total_weeks, start_date, end_date)')
+    .select('*')
     .eq('user_id', user.id)
     .single()
 
-  const program = Array.isArray(profile?.program) ? profile.program[0] : profile?.program
+  // Active program
+  const { data: program } = await supabase
+    .from('programs')
+    .select('id, total_weeks, start_date, end_date')
+    .eq('student_id', user.id)
+    .eq('status', 'active')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single()
 
   // Active unit
   const { data: currentUnit } = program
