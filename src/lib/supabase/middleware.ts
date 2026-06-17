@@ -1,12 +1,12 @@
 import { createServerClient } from '@supabase/ssr'
-import { createClient } from '@supabase/supabase-js'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Edge-compatible admin client (no cookies needed — service role bypasses RLS)
 function adminClient() {
-  return createClient(
+  return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
+    { cookies: { getAll: () => [], setAll: () => {} } }
   )
 }
 
