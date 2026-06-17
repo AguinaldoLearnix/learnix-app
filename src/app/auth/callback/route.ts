@@ -27,6 +27,10 @@ export async function GET(request: NextRequest) {
     )
 
     const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (error) {
+      console.error('[auth/callback] exchangeCodeForSession error:', error.message)
+      return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(error.message)}`, origin))
+    }
     if (!error) {
       const { data: { user } } = await supabase.auth.getUser()
       const { data: profile } = await supabase.from('users').select('role, created_at').eq('id', user!.id).single()
