@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     can_do_statements: u.can_do_statements,
     pre_lesson_text: u.pre_lesson_text,
     pre_lesson_questions: u.pre_lesson_questions,
-    status: i === 0 ? 'active' : 'locked',
+    status: i === 0 ? 'active' : 'upcoming',
   }))
 
   const { error: unitsError } = await admin.from('weekly_units').insert(units)
