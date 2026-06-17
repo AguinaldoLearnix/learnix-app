@@ -65,7 +65,6 @@ export async function POST(request: NextRequest) {
       start_date: startDate.toISOString().split('T')[0],
       end_date: endDate.toISOString().split('T')[0],
       status: 'active',
-      created_by: user.id,
     })
     .select('id')
     .single()
