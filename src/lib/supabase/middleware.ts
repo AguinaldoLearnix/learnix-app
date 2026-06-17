@@ -40,8 +40,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Redirect authenticated users away from auth pages based on role
-  if (user && isPublic) {
+  // Redirect authenticated users away from auth pages based on role (skip API routes)
+  if (user && isPublic && !pathname.startsWith('/api/')) {
     const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).single()
     const role = profile?.role ?? 'student'
     const url = request.nextUrl.clone()
