@@ -28,7 +28,7 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Public routes — accessible without auth
-  const publicRoutes = ['/login', '/signup', '/reset-password']
+  const publicRoutes = ['/login', '/signup', '/reset-password', '/api/auth', '/auth/callback']
   const onboardingRoutes = ['/onboarding', '/onboarding/role']
   const isPublic = publicRoutes.some(r => pathname.startsWith(r))
   const isOnboarding = onboardingRoutes.some(r => pathname.startsWith(r))
