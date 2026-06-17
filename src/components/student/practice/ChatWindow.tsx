@@ -55,12 +55,51 @@ export function ChatWindow({ mode, initialMessages = [], context }: Props) {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  // Stop any playing audio when mode changes
+  // Stop any playing audio when mode changes and auto-start conversation
   useEffect(() => {
     audioRef.current?.pause()
     setSpeakingState('idle')
     setMessages([])
+    // Auto-initiate: send a hidden "start" trigger so AI opens the session
+    const timer = setTimeout(() => {
+      autoStart(mode)
+    }, 300)
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode])
+
+  const autoStart = useCallback(async (currentMode: PracticeMode) => {
+    setLoading(true)
+    const starterMsg = currentMode === 'vocabulary'
+      ? '__start_vocabulary__'
+      : currentMode === 'writing'
+      ? '__start_writing__'
+      : currentMode === 'speaking'
+      ? '__start_speaking__'
+      : currentMode === 'simulation'
+      ? '__start_simulation__'
+      : '__start_error_review__'
+    try {
+      const res = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: starterMsg }],
+          mode: currentMode,
+          context,
+        }),
+      })
+      const data = await res.json()
+      if (data.reply) {
+        setMessages([{ role: 'assistant', content: data.reply }])
+        speakText(data.reply)
+      }
+    } catch {
+      // silently fail — user can still type manually
+    } finally {
+      setLoading(false)
+    }
+  }, [context, speakText])
 
   const speakText = useCallback(async (text: string) => {
     if (!autoSpeak) return
