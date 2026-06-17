@@ -24,6 +24,8 @@ export default function LoginPage() {
     if (result?.error) {
       setError(result.error)
       setLoading(false)
+    } else if (result?.redirectTo) {
+      window.location.href = result.redirectTo
     }
   }
 

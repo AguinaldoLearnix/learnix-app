@@ -67,6 +67,8 @@ function SignupForm() {
     } else if (result?.confirm) {
       setError('Verifique seu e-mail para confirmar sua conta antes de continuar.')
       setLoading(false)
+    } else if (result?.redirectTo) {
+      window.location.href = result.redirectTo
     }
   }
 
@@ -267,6 +269,7 @@ function SignupForm() {
                       const result = await signup(fd)
                       if (result?.error) { setError(result.error); setLoading(false) }
                       else if (result?.confirm) { setError('Verifique seu e-mail para confirmar sua conta antes de continuar.'); setLoading(false) }
+                      else if (result?.redirectTo) { window.location.href = result.redirectTo }
                     }}
                     className="w-full flex items-center justify-center gap-2 py-3 rounded-full text-[13px] font-semibold mt-2 transition-opacity hover:opacity-80 disabled:opacity-40"
                     style={{ background: '#FACC15', color: '#0C0B0A' }}

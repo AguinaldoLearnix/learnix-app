@@ -3,6 +3,8 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
+// NOTE: logout() still uses redirect() — that's intentional (no session to preserve)
+
 export async function login(formData: FormData) {
   const supabase = await createClient()
 
@@ -20,10 +22,10 @@ export async function login(formData: FormData) {
   if (role === 'teacher') {
     const { data: teacherProfile } = await supabase
       .from('teacher_profiles').select('user_id').eq('user_id', user!.id).single()
-    redirect(teacherProfile ? '/teacher' : '/onboarding/teacher')
+    return { redirectTo: teacherProfile ? '/teacher' : '/onboarding/teacher' }
   }
 
-  redirect(role === 'admin' ? '/admin' : '/student')
+  return { redirectTo: role === 'admin' ? '/admin' : '/student' }
 }
 
 export async function signup(formData: FormData) {
@@ -88,7 +90,7 @@ export async function signup(formData: FormData) {
     }
   }
 
-  redirect(role === 'teacher' ? '/onboarding/teacher' : '/onboarding')
+  return { redirectTo: role === 'teacher' ? '/onboarding/teacher' : '/onboarding' }
 }
 
 export async function logout() {
