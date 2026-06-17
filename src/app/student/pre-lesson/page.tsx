@@ -7,13 +7,15 @@ async function getCurrentUnit() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  const { data: profile } = await supabase
-    .from('student_profiles')
-    .select('*, program:programs(id)')
-    .eq('user_id', user.id)
+  const { data: program } = await supabase
+    .from('programs')
+    .select('id')
+    .eq('student_id', user.id)
+    .eq('status', 'active')
+    .order('created_at', { ascending: false })
+    .limit(1)
     .single()
 
-  const program = Array.isArray(profile?.program) ? profile.program[0] : profile?.program
   if (!program) return null
 
   const { data: unit } = await supabase
