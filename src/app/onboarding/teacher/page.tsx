@@ -28,15 +28,16 @@ export default function TeacherOnboarding() {
 
   async function handleSave() {
     setSaving(true)
-    try {
-      await completeTeacherOnboarding({
-        languages: selectedLanguages,
-        specialties: selectedSpecialties,
-        bio,
-        rate_per_hour: ratePerHour,
-        max_students: maxStudents,
-      })
-    } catch {
+    const result = await completeTeacherOnboarding({
+      languages: selectedLanguages,
+      specialties: selectedSpecialties,
+      bio,
+      rate_per_hour: ratePerHour,
+      max_students: maxStudents,
+    })
+    if (result?.redirectTo) {
+      window.location.href = result.redirectTo
+    } else {
       setSaving(false)
     }
   }

@@ -119,20 +119,21 @@ export default function StudentOnboarding() {
   async function handleConfirm() {
     if (!program) return
     setSaving(true)
-    try {
-      await completeStudentOnboarding({
-        professional_area: professionalArea,
-        language,
-        goal,
-        target_level: targetLevel,
-        deadline_months: deadlineMonths,
-        weekly_frequency: weeklyFrequency,
-        study_time_daily: studyTimeDaily,
-        interests,
-        assessed_level: assessedLevel,
-        program,
-      })
-    } catch {
+    const result = await completeStudentOnboarding({
+      professional_area: professionalArea,
+      language,
+      goal,
+      target_level: targetLevel,
+      deadline_months: deadlineMonths,
+      weekly_frequency: weeklyFrequency,
+      study_time_daily: studyTimeDaily,
+      interests,
+      assessed_level: assessedLevel,
+      program,
+    })
+    if (result?.redirectTo) {
+      window.location.href = result.redirectTo
+    } else {
       setSaving(false)
     }
   }

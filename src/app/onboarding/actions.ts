@@ -1,7 +1,6 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 
 interface OnboardingData {
   professional_area: string
@@ -84,7 +83,7 @@ export async function completeStudentOnboarding(data: OnboardingData) {
   const { error: unitsError } = await supabase.from('weekly_units').insert(units)
   if (unitsError) return { error: unitsError.message }
 
-  redirect('/student')
+  return { redirectTo: '/student' }
 }
 
 export async function completeTeacherOnboarding(data: {
@@ -98,15 +97,15 @@ export async function completeTeacherOnboarding(data: {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Não autenticado' }
 
-  await supabase.from('teacher_profiles').upsert({
+  const { error } = await supabase.from('teacher_profiles').upsert({
     user_id: user.id,
     languages: data.languages,
     specialties: data.specialties,
     bio: data.bio,
     rate_per_hour: data.rate_per_hour,
     max_students: data.max_students,
-    onboarding_completed: true,
   }, { onConflict: 'user_id' })
 
-  redirect('/teacher')
+  if (error) return { error: error.message }
+  return { redirectTo: '/teacher' }
 }
