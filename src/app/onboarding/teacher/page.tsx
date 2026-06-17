@@ -15,6 +15,7 @@ type Step = 'languages' | 'profile' | 'done'
 export default function TeacherOnboarding() {
   const [step, setStep] = useState<Step>('languages')
   const [saving, setSaving] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
 
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['Inglês'])
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([])
@@ -28,6 +29,7 @@ export default function TeacherOnboarding() {
 
   async function handleSave() {
     setSaving(true)
+    setErrorMsg('')
     const result = await completeTeacherOnboarding({
       languages: selectedLanguages,
       specialties: selectedSpecialties,
@@ -38,6 +40,7 @@ export default function TeacherOnboarding() {
     if (result?.redirectTo) {
       window.location.href = result.redirectTo
     } else {
+      setErrorMsg(result?.error ?? 'Erro desconhecido — tente novamente.')
       setSaving(false)
     }
   }
@@ -176,6 +179,12 @@ export default function TeacherOnboarding() {
                 />
               </div>
             </div>
+
+            {errorMsg && (
+              <p className="text-[12px] px-3 py-2 rounded-lg" style={{ background: 'rgba(239,68,68,0.10)', color: '#F87171' }}>
+                {errorMsg}
+              </p>
+            )}
 
             <div className="flex gap-3">
               <button
