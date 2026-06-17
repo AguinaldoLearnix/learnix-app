@@ -4,7 +4,7 @@ import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { GraduationCap, Eye, EyeOff, ChevronRight } from 'lucide-react'
-import { signup, signInWithGoogle } from '@/app/auth/actions'
+import { signInWithGoogle } from '@/app/auth/actions'
 
 type Step = 'role' | 'account' | 'profile'
 
@@ -60,7 +60,12 @@ function SignupForm() {
     Object.entries(form).forEach(([k, v]) => fd.set(k, v))
     fd.set('role', inviteToken ? 'student' : role)
     if (inviteToken) fd.set('invite_token', inviteToken)
-    const result = await signup(fd)
+    const res = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(Object.fromEntries(fd)),
+    })
+    const result = await res.json()
     if (result?.error) {
       setError(result.error)
       setLoading(false)
@@ -266,7 +271,12 @@ function SignupForm() {
                       const fd = new FormData()
                       Object.entries(form).forEach(([k, v]) => fd.set(k, v))
                       fd.set('role', 'teacher')
-                      const result = await signup(fd)
+                      const res = await fetch('/api/auth/signup', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(Object.fromEntries(fd)),
+                      })
+                      const result = await res.json()
                       if (result?.error) { setError(result.error); setLoading(false) }
                       else if (result?.confirm) { setError('Verifique seu e-mail para confirmar sua conta antes de continuar.'); setLoading(false) }
                       else if (result?.redirectTo) { window.location.href = result.redirectTo }

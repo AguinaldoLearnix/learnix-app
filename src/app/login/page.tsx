@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { GraduationCap, Eye, EyeOff } from 'lucide-react'
-import { login, signInWithGoogle } from '@/app/auth/actions'
+import { signInWithGoogle } from '@/app/auth/actions'
 
 export default function LoginPage() {
   const [showPw, setShowPw] = useState(false)
@@ -20,7 +20,16 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
-    const result = await login(new FormData(e.currentTarget))
+    const form = e.currentTarget
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: (form.elements.namedItem('email') as HTMLInputElement).value,
+        password: (form.elements.namedItem('password') as HTMLInputElement).value,
+      }),
+    })
+    const result = await res.json()
     if (result?.error) {
       setError(result.error)
       setLoading(false)
