@@ -1,5 +1,14 @@
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdmin } from '@supabase/supabase-js'
 import type { StudentDashboard, ErrorBankEntry } from '@/types'
+
+function adminClient() {
+  return createAdmin(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  )
+}
 
 export async function getStudentDashboard(): Promise<StudentDashboard | null> {
   const supabase = await createClient()
@@ -14,8 +23,10 @@ export async function getStudentDashboard(): Promise<StudentDashboard | null> {
     .eq('user_id', user.id)
     .single()
 
-  // Active program
-  const { data: program } = await supabase
+  const admin = adminClient()
+
+  // Active program (bypass RLS — programs table has no student read policy)
+  const { data: program } = await admin
     .from('programs')
     .select('id, total_weeks, start_date, end_date')
     .eq('student_id', user.id)
@@ -26,7 +37,7 @@ export async function getStudentDashboard(): Promise<StudentDashboard | null> {
 
   // Active unit
   const { data: currentUnit } = program
-    ? await supabase
+    ? await admin
         .from('weekly_units')
         .select('*')
         .eq('program_id', program.id)

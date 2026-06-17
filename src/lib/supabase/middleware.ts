@@ -1,5 +1,14 @@
 import { createServerClient } from '@supabase/ssr'
+import { createClient } from '@supabase/supabase-js'
 import { NextResponse, type NextRequest } from 'next/server'
+
+function adminClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  )
+}
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -49,9 +58,9 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Redirect student to onboarding if no program exists
+  // Redirect student to onboarding if no program exists (use service role to bypass RLS)
   if (user && pathname.startsWith('/student') && !isOnboarding) {
-    const { count } = await supabase
+    const { count } = await adminClient()
       .from('programs')
       .select('*', { count: 'exact', head: true })
       .eq('student_id', user.id)
